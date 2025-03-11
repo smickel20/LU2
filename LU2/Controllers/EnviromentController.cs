@@ -23,10 +23,10 @@ namespace LU2.Controllers
         }
 
         // GET: /Environment
-        [HttpGet("total/{userid}")]
-        public async Task<ActionResult<Environment2D>> GetAllEnviroments(string userid)
+        [HttpGet("total/{email}")]
+        public async Task<ActionResult<Environment2D>> GetAllEnviroments(string email)
         {
-            var enviroments = await _enviromentRepository.GetAllEnvironments(userid);
+            var enviroments = await _enviromentRepository.GetAllEnvironments(email);
             return Ok(enviroments);
         }
 
@@ -42,13 +42,13 @@ namespace LU2.Controllers
         }
 
         // POST: /Environment
-        [HttpPost]
-        public async Task<ActionResult<Environment2D>> Create([FromBody] Environment2D environment)
+        [HttpPost("{email}")]
+        public async Task<ActionResult<Environment2D>> Create([FromBody] Environment2D environment, string email)
         {
             if (environment == null)
                 return BadRequest("Invalid data.");
 
-            var createdEnvironment = await _enviromentRepository.CreateAsync(environment);
+            var createdEnvironment = await _enviromentRepository.CreateAsync(environment, email);
             return CreatedAtAction(nameof(GetById), new { id = createdEnvironment.Id }, createdEnvironment);
         }
 
@@ -79,9 +79,11 @@ namespace LU2.Controllers
                 return NotFound($"Environment with ID {id} not found.");
 
             await _enviromentRepository.DeleteAsync(id);
-            return NoContent();
+
+            return Ok(new { message = $"Environment with ID {id} has been successfully deleted." });
         }
 
-        
+
+
     }
 }

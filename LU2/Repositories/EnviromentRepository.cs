@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LU2.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -18,13 +19,22 @@ namespace ProjectMap.WebApi.Repositories
         }
 
         // Read all environments
-        public async Task<IEnumerable<Environment2D>> GetAllEnvironments(string id)
+        public async Task<IEnumerable<Environment2D>> GetAllEnvironments(string email)
         {
             using (var sqlConnection = new SqlConnection(_sqlConnectionString))
             {
                 await sqlConnection.OpenAsync();
 
-                var userId = Guid.Parse(id);
+                // Retrieve the user by email
+                var user = await sqlConnection.QuerySingleOrDefaultAsync<dynamic>(
+                    "SELECT Id FROM [auth].[AspNetUsers] WHERE UserName = @UserName", new { UserName = email });
+
+                if (user == null)
+                {
+                    throw new ArgumentException("User not found", nameof(email));
+                }
+
+                var userId = user.Id;
 
                 // Retrieve raw data from the database
                 var rawData = await sqlConnection.QueryAsync<dynamic>(
@@ -85,14 +95,24 @@ namespace ProjectMap.WebApi.Repositories
 
 
         // Create a new environment
-        public async Task<Environment2D> CreateAsync(Environment2D environment)
+        public async Task<Environment2D> CreateAsync(Environment2D environment, string email)
         {
             using (var sqlConnection = new SqlConnection(_sqlConnectionString))
             {
                await sqlConnection.OpenAsync();
-                
+
+                var user = await sqlConnection.QuerySingleOrDefaultAsync<dynamic>(
+                    "SELECT Id FROM [auth].[AspNetUsers] WHERE UserName = @UserName", new { UserName = email });
+
+                if (user == null)
+                {
+                    throw new ArgumentException("User not found", nameof(email));
+                }
+
+
+
                 environment.Id = Guid.NewGuid();
-                environment.userId = Guid.Parse(environment.userId.ToString());
+                environment.userId = Guid.Parse(user.Id);
 
                 var query = "INSERT INTO [Environments2D] (Id, Name, MaxHeight, MaxLength, userId) " +
                         "VALUES (@Id, @Name, @MaxHeight, @MaxLength, @userId);";
@@ -123,8 +143,9 @@ namespace ProjectMap.WebApi.Repositories
             using (var sqlConnection = new SqlConnection(_sqlConnectionString))
             {
                 await sqlConnection.OpenAsync();
+                var enviromentId = Guid.Parse(id);
                 var query = "DELETE FROM [Environments2D] WHERE Id = @Id";
-                await sqlConnection.ExecuteAsync(query, new { Id = id });
+                await sqlConnection.ExecuteAsync(query, new { Id = enviromentId });
             }
         }
     }
