@@ -109,6 +109,13 @@ namespace ProjectMap.WebApi.Repositories
                     throw new ArgumentException("User not found", nameof(email));
                 }
 
+                var environmentCount = await sqlConnection.QuerySingleAsync<int>(
+                    "SELECT COUNT(*) FROM [Environments2D] WHERE userId = @UserId", new { UserId = user.Id });
+
+                if (environmentCount >= 5)
+                {
+                    throw new InvalidOperationException("User cannot have more than 5 environments.");
+                }
 
 
                 environment.Id = Guid.NewGuid();
