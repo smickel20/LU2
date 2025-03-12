@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthorization();
 
 string connStr = builder.Configuration["ConnectionStr"];
+var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(connStr);
 
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {
@@ -40,5 +41,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.MapGroup("/account").MapIdentityApi<IdentityUser>();
+
+// Diagnostic homepage
+app.MapGet("/", () => $"The API is up. Connection string found: {sqlConnectionStringFound}");
 
 app.Run();
