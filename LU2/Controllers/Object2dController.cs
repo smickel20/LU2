@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace LU2.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("/[controller]")]
     public class Object2dController : ControllerBase
     {
