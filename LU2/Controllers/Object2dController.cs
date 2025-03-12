@@ -1,4 +1,5 @@
 ﻿using LU2.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProjectMap.WebApi.Repositories;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 namespace LU2.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/[controller]")]
     public class Object2dController : ControllerBase
     {

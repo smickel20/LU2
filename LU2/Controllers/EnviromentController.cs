@@ -1,4 +1,5 @@
 ﻿using LU2.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 namespace LU2.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/[controller]")]
     public class EnvironmentController : ControllerBase
     {
