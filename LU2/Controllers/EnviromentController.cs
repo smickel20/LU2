@@ -51,7 +51,7 @@ namespace LU2.Controllers
             var createdEnvironment = await _enviromentRepository.CreateAsync(environment, email);
             return CreatedAtAction(nameof(GetById), new { id = createdEnvironment.Id }, createdEnvironment);
         }
-         //b
+        
         // PUT: /Environment/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] Environment2D environment)
